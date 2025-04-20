@@ -78,7 +78,6 @@
 
 <label for="seguroPorcentagem">
   Seguro (% sobre valor da nota):
-  <a href="seguro.jpeg.jpeg" target="_blank" class="seguro-link">Clique para ver a porcentagem do seguro por estado</a>
 </label>
 <input type="number" id="seguroPorcentagem" step="0.01" placeholder="Ex: 10" />
 
