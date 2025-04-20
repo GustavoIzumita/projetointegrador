@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <h1 style="color:blue">Transporte Izumita</h1>
+  <meta charset="UTF-8">
+  <title>Calculadora de Frete e Comissão</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    label, select, input {
+      display: block;
+      margin: 10px 0;
+    }
+
+    .result, .history {
+      margin-top: 20px;
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    button {
+      margin: 5px 5px 0 0;
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .history-item {
+      border-top: 1px solid #ccc;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    .seguro-link {
+      font-size: 0.9em;
+      color: blue;
+      text-decoration: underline;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Calculadora de Frete e Comissão</h2>
+
+<label for="porte">Porte:</label>
+<select id="porte">
+  <option value="pequeno">Pequeno</option>
+  <option value="medio">Médio</option>
+  <option value="grande">Grande</option>
+</select>
+
+<label for="valorKm">Valor por Km (R$):</label>
+<input type="number" id="valorKm" step="0.01" placeholder="Ex: 2.50" />
+
+<label for="distancia">Distância (Km):</label>
+<input type="number" id="distancia" placeholder="Ex: 100" />
+
+<label for="tipoPercurso">Tipo de percurso:</label>
+<select id="tipoPercurso">
+  <option value="ida">Ida</option>
+  <option value="idaVolta">Ida e Volta</option>
+  <option value="volta">Só Volta</option>
+</select>
+
+<label for="seguroPorcentagem">
+  Seguro (% sobre valor da nota):
+  <a href="seguro.jpeg.jpeg" target="_blank" class="seguro-link">Clique para ver a porcentagem do seguro por estado</a>
+</label>
+<input type="number" id="seguroPorcentagem" step="0.01" placeholder="Ex: 10" />
+
+<label for="valorNota">Valor da Nota Fiscal (R$):</label>
+<input type="number" id="valorNota" step="0.01" placeholder="Ex: 1000" />
+
+<button onclick="calcularFrete()">Calcular</button>
+<button onclick="novoCalculo()">Novo Cálculo</button>
+
+<div class="result" id="resultado"></div>
+
+<div class="history" id="historico">
+  <h3>Histórico de Cálculos</h3>
+  <div id="listaHistorico"></div>
+</div>
+
+<script>
+  let historico = [];
+
+  function calcularFrete() {
+    const porte = document.getElementById('porte').value;
+    const valorKm = parseFloat(document.getElementById('valorKm').value);
+    const distancia = parseFloat(document.getElementById('distancia').value);
+    const tipoPercurso = document.getElementById('tipoPercurso').value;
+    const seguroPorcentagem = parseFloat(document.getElementById('seguroPorcentagem').value);
+    const valorNota = parseFloat(document.getElementById('valorNota').value);
+
+    if (isNaN(valorKm) || isNaN(distancia) || isNaN(seguroPorcentagem) || isNaN(valorNota)) {
+      alert("Preencha todos os campos corretamente.");
+      return;
+    }
+
+    let multiplicador = 1;
+    if (tipoPercurso === "idaVolta") multiplicador = 2;
+
+    const distanciaFinal = distancia * multiplicador;
+    const frete = valorKm * distanciaFinal;
+    const seguro = valorNota * (seguroPorcentagem / 100);
+    const imposto = frete * 0.15;
+    const saldo = frete - seguro - imposto;
+    const comissao = saldo * 0.15;
+
+    const resultado = `
+      <strong>Porte:</strong> ${porte}<br>
+      <strong>Tipo de percurso:</strong> ${tipoPercurso.replace("idaVolta", "Ida e Volta")}<br>
+      <strong>Distância total:</strong> ${distanciaFinal} km<br>
+      <strong>Frete:</strong> R$ ${frete.toFixed(2)}<br>
+      <strong>Seguro (${seguroPorcentagem}% de R$${valorNota.toFixed(2)}):</strong> R$ ${seguro.toFixed(2)}<br>
+      <strong>Imposto (15% sobre frete):</strong> R$ ${imposto.toFixed(2)}<br>
+      <strong>Saldo:</strong> R$ ${saldo.toFixed(2)}<br>
+      <strong>Comissão (15% do saldo):</strong> <span style="color: green;">R$ ${comissao.toFixed(2)}</span>
+    `;
+
+    document.getElementById('resultado').innerHTML = resultado;
+
+    historico.push(resultado);
+    atualizarHistorico();
+  }
+
+  function atualizarHistorico() {
+    const lista = document.getElementById('listaHistorico');
+    lista.innerHTML = "";
+    historico.forEach((item, index) => {
+      lista.innerHTML += `<div class="history-item"><strong>Cálculo ${index + 1}:</strong><br>${item}</div>`;
+    });
+  }
+
+  function novoCalculo() {
+    document.getElementById('valorKm').value = "";
+    document.getElementById('distancia').value = "";
+    document.getElementById('seguroPorcentagem').value = "";
+    document.getElementById('valorNota').value = "";
+    document.getElementById('resultado').innerHTML = "";
+  }
+</script>
+
+</body>
+</html>
